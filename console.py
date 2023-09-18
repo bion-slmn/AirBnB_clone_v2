@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """ Console Module """
 import cmd
+import re
 import sys
 import re
 from models.base_model import BaseModel
@@ -121,39 +122,34 @@ class HBNBCommand(cmd.Cmd):
             print("** class name missing **")
             return
         c_name, *params = args.split()
+
+        c_name, *params = args.split()
+        if c_name not in HBNBCommand.classes:
+            print("** class doesn't exist **")
+            return
+        
         new_instance = HBNBCommand.classes[c_name]()
         storage.save()
         print(new_instance.id)
         storage.save()
         if params[0]:
+            pattern = re.compile('(.+?)=(.+)')
+            thisdic = {}
             for param in params:
-                parts = param.split('=')
-                if len(parts) != 2:
-                    print("Invalid parameter format:", param)
-                    return
-                name, value = parts[0], parts[1]
-                value = value.strip('"')  # Remove quotes if present
-                setattr(new_instance, name, value)
-        storage.save()
-
-#            pattern = re.compile('(.+?)=(.+)')
-#            thisdic = {}
-#            for param in params:
-#                result = pattern.search(param)
-#                name = result.group(1)
-#                value = result.group(2)
-#                if value.startswith('"') and value.endswith('"'):
-#                    value = value.strip('"').replace('"', '\"') \
-#                            .replace('_', ' ')
-#                    thisdic.update({name: value})
-#                elif '.' in value:
-#                    thisdic.update({name: value})
-#                elif int(value):
-#                    thisdic.update({name: value})
-#                else:
- #                   continue
-
-            
+                result = pattern.search(param)
+                name = result.group(1)
+                value = result.group(2)
+                if value.startswith('"') and value.endswith('"'):
+                    value = value.strip('"').replace('"', '\"') \
+                            .replace('_', ' ')
+                    thisdic.update({name: value})
+                elif '.' in value:
+                    thisdic.update({name: float(value)})
+                elif int(value):
+                    thisdic.update({name: int(value)})
+                else:
+                    continue
+            new_instance.__dict__.update(thisdic)
 
     def help_create(self):
         """ Help information for the create method """
