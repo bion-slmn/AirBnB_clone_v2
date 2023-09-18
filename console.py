@@ -124,7 +124,7 @@ class HBNBCommand(cmd.Cmd):
         if c_name not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-
+        
         new_instance = HBNBCommand.classes[c_name]()
         storage.save()
         print(new_instance.id)
@@ -141,13 +141,12 @@ class HBNBCommand(cmd.Cmd):
                             .replace('_', ' ')
                     thisdic.update({name: value})
                 elif '.' in value:
-                    thisdic.update({name: value})
+                    thisdic.update({name: float(value)})
                 elif int(value):
-                    thisdic.update({name: value})
+                    thisdic.update({name: int(value)})
                 else:
                     continue
-            line = f'{c_name} {new_instance.id} {thisdic}'
-            self.do_update(line)
+            new_instance.__dict__.update(thisdic)
 
     def help_create(self):
         """ Help information for the create method """
