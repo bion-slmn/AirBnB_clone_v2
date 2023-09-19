@@ -3,7 +3,7 @@
 import cmd
 import re
 import sys
-import re
+from os import getenv
 from models.base_model import BaseModel
 from models.__init__ import storage
 from models.user import User
@@ -117,39 +117,34 @@ class HBNBCommand(cmd.Cmd):
 
     def do_create(self, args):
         """ Create an object of any class"""
-
         if not args:
             print("** class name missing **")
             return
-        c_name, *params = args.split()
 
-        c_name, *params = args.split()
+        c_name, *para = args.split(' ')
         if c_name not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-        
-        new_instance = HBNBCommand.classes[c_name]()
+        kwarg = {}
+        for x in para:
+            key, value = x.split('=')
+            if value.startswith('"'):
+                value = value.strip('"').replace('_', ' ')
+            elif '.' in value:
+                value = float(value)
+            elif int(value):
+                value = int(value)
+            else:
+                continue
+            kwarg[key] = value
+
+        if kwarg == {}:
+            obj = HBNBCommand.classes[c_name]()
+        else:
+            obj = HBNBCommand.classes[c_name](**kwarg)
+            storage.new(obj)
+        print(obj.id)
         storage.save()
-        print(new_instance.id)
-        storage.save()
-        if params[0]:
-            pattern = re.compile('(.+?)=(.+)')
-            thisdic = {}
-            for param in params:
-                result = pattern.search(param)
-                name = result.group(1)
-                value = result.group(2)
-                if value.startswith('"') and value.endswith('"'):
-                    value = value.strip('"').replace('"', '\"') \
-                            .replace('_', ' ')
-                    thisdic.update({name: value})
-                elif '.' in value:
-                    thisdic.update({name: float(value)})
-                elif int(value):
-                    thisdic.update({name: int(value)})
-                else:
-                    continue
-            new_instance.__dict__.update(thisdic)
 
     def help_create(self):
         """ Help information for the create method """
@@ -222,23 +217,21 @@ class HBNBCommand(cmd.Cmd):
         print("Destroys an individual instance of a class")
         print("[Usage]: destroy <className> <objectId>\n")
 
-    def do_all(self, args):
-        """ Shows all objects, or all objects of a class"""
-        print_list = []
+    def do_all(self, line):
+        """Usage: all or all <class> or <class>.all()
+        Display string representations of all instances of a given class.
+        If no class is specified, displays all instantiated objects."""
+        if not line:
+            objs = storage.all()
+            print([str(objs[key]) for key in objs])
+            return
+        args = line.split(" ")
+        if args[0] not in HBNBCommand.classes:
+            print("** class doesn't exist **")
+            return
 
-        if args:
-            args = args.split(' ')[0]  # remove possible trailing args
-            if args not in HBNBCommand.classes:
-                print("** class doesn't exist **")
-                return
-            for k, v in storage._FileStorage__objects.items():
-                if k.split('.')[0] == args:
-                    print_list.append(str(v))
-        else:
-            for k, v in storage._FileStorage__objects.items():
-                print_list.append(str(v))
-
-        print(print_list)
+        objs = storage.all(HBNBCommand.classes[args[0]])
+        print([str(objs[key]) for key in objs])
 
     def help_all(self):
         """ Help information for the all command """

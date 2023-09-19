@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 '''this module creates a database engine'''
-from os import environ
+from os import getenv
 from sqlalchemy import create_engine
 from models.base_model import BaseModel, Base
 from sqlalchemy.orm import sessionmaker
@@ -20,26 +20,27 @@ class DBStorage():
 
     def __init__(self):
         ''' initalize values in to the class'''
-        self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'
-                        .format(environ.get('HBNB_MYSQL_USER'),
-                        environ.get('HBNB_MYSQL_PWD'),
-                        environ.get('HBNB_MYSQL_HOST'),
-                        environ.get('HBNB_MYSQL_DB')),pool_pre_ping=True)
-        
-        if (environ.get('HBNB_ENV') == 'test'): # drop all tables
-            meta = MetaData()
-            meta.reflect(bind=self.__engine)
-            meta.drop_all(bind=self.__engine)
+        self.__engine = create_engine("mysql+mysqldb://{}:{}@{}/{}".
+                                      format(getenv("HBNB_MYSQL_USER"),
+                                             getenv("HBNB_MYSQL_PWD"),
+                                             getenv("HBNB_MYSQL_HOST"),
+                                             getenv("HBNB_MYSQL_DB")),
+                                      pool_pre_ping=True)
+
+        if (getenv('HBNB_ENV') == 'test'):  # drop all tables
+            Base.metadata.drop_all(bind=self.__engine)
 
     def all(self, cls=None):
         '''query for a class if given or query for all classes'''
 
         if cls:
+            if type(cls) == str:
+                cls = eval(cls)
             result = self.__session.query(cls).all()
             newdict = {}
-            for row in result:
-                key = f'{cls.__name__}.{row.id}'
-                value = row
+            for obj in result:
+                key = f'{cls.__name__}.{obj.id}'
+                value = obj
                 newdict[key] = value
             return newdict
         objs = self.__session.query(State).all()
@@ -53,7 +54,7 @@ class DBStorage():
     def new(self, obj):
         '''add the object to the current database session'''
         self.__session.add(obj)
-    
+
     def save(self):
         ''' commit all changes of the current database session'''
         self.__session.commit()
@@ -66,6 +67,7 @@ class DBStorage():
     def reload(self):
         '''create all tables in the database'''
         Base.metadata.create_all(self.__engine)
-        session_factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
+        session_factory = sessionmaker(bind=self.__engine,
+                                       expire_on_commit=False)
         Session = scoped_session(session_factory)
         self.__session = Session()
