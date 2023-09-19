@@ -26,7 +26,7 @@ class DBStorage():
                         environ.get('HBNB_MYSQL_HOST'),
                         environ.get('HBNB_MYSQL_DB')),pool_pre_ping=True)
         
-        if (environ.get('HBNB_ENV') == 'test'):
+        if (environ.get('HBNB_ENV') == 'test'): # drop all tables
             meta = MetaData()
             meta.reflect(bind=self.__engine)
             meta.drop_all(bind=self.__engine)
@@ -44,10 +44,10 @@ class DBStorage():
             return newdict
         objs = self.__session.query(State).all()
         objs.extend(self.__session.query(City).all())
-        #objs.extend(self.__session.query(User).all())
-        #objs.extend(self.__session.query(Place).all())
-        #objs.extend(self.__session.query(Review).all())
-        #objs.extend(self.__session.query(Amenity).all())
+        objs.extend(self.__session.query(User).all())
+        objs.extend(self.__session.query(Place).all())
+        objs.extend(self.__session.query(Review).all())
+        objs.extend(self.__session.query(Amenity).all())
         return {f'{type(o).__name__}.{o.id}': o for o in objs}
 
     def new(self, obj):
@@ -61,8 +61,7 @@ class DBStorage():
     def delete(self, obj=None):
         '''delete from the current database session obj if not None'''
         if obj:
-            obj_d = self.__session.query(obj.__class__.__name__).get(obj.id)
-            self.__session.delete(obj_d)
+            self.__session.delete(obj)
 
     def reload(self):
         '''create all tables in the database'''
