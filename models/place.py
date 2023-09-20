@@ -40,12 +40,16 @@ class Place(BaseModel, Base):
     amenity_ids = []
     reviews = relationship('Review', backref='place', cascade='delete')
 
+    """
     if getenv("HBNB_TYPE_STORAGE", None) != 'db':
         @property
         def reviews(self):
-            """Get list of linked reviews"""
+            """
+            # Get list of linked reviews
+            """
             related_reviews = []
             for review in list(models.storage.all(Review).values()):
                 if review.place_id == self.id:
                     related_reviews.append(review)
             return related_reviews
+    """
