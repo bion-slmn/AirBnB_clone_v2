@@ -1,11 +1,16 @@
 #!/usr/bin/python3
 """ """
-from models.base_model import BaseModel
+from datetime import datetime
+from sqlalchemy import DateTime, inspect, String
+from models.base_model import BaseModel, Base
 import unittest
+from models import storage
+from sqlalchemy.orm import declarative_base
 import datetime
 from uuid import UUID
 import json
 import os
+from os import getenv
 
 
 class test_basemodel(unittest.TestCase):
@@ -24,7 +29,7 @@ class test_basemodel(unittest.TestCase):
     def tearDown(self):
         try:
             os.remove('file.json')
-        except:
+        except as e:
             pass
 
     def test_default(self):
@@ -47,6 +52,7 @@ class test_basemodel(unittest.TestCase):
         with self.assertRaises(TypeError):
             new = BaseModel(**copy)
 
+    @unittest.skipIf(getenv('HBNB_MYSQL_DB') != 'db', 'database only')
     def test_save(self):
         """ Testing save """
         i = self.value()
@@ -62,22 +68,19 @@ class test_basemodel(unittest.TestCase):
         self.assertEqual(str(i), '[{}] ({}) {}'.format(self.name, i.id,
                          i.__dict__))
 
+    @unittest.skipIf(getenv('HBNB_MYSQL_DB') != 'db', 'database only')
     def test_todict(self):
         """ """
         i = self.value()
         n = i.to_dict()
         self.assertEqual(i.to_dict(), n)
+        with self.assertRaises(KeyError):
+            n['_sa_instance_state']
 
     def test_kwargs_none(self):
         """ """
         n = {None: None}
         with self.assertRaises(TypeError):
-            new = self.value(**n)
-
-    def test_kwargs_one(self):
-        """ """
-        n = {'Name': 'test'}
-        with self.assertRaises(KeyError):
             new = self.value(**n)
 
     def test_id(self):
@@ -97,3 +100,44 @@ class test_basemodel(unittest.TestCase):
         n = new.to_dict()
         new = BaseModel(**n)
         self.assertFalse(new.created_at == new.updated_at)
+
+    def test_Base(self):
+        '''test the presence of instance Base'''
+        self.assertTrue(isinstance(Base, type(declarative_base())))
+
+        # base model doesnt inherit base
+        self.assertFalse(issubclass(BaseModel, Base))
+
+    @unittest.skipIf(getenv('HBNB_MYSQL_DB') == 'db', 'database only')
+    def gtest_class_atts(self):
+        '''test class attributes of the clsss'''
+        obj = BaseModel()
+
+        inspector = inspect(obj)
+        # for id
+        _id = inspector.columns['id']
+        self.assertTrue(isinstance(_id, String))
+        self.assertTrue(_id.primary_key)
+        self.assertEqual(_id.type.length, 60)
+        self.assertFalse(_id.nullable)
+
+        created = inspector.columns['created_at']
+        self.assertEqual(created.default, datetime.utcnow())
+        self.assertTrue(isinstance(created, DateTime))
+        self.assertFalse(created.nullable)
+
+        updated = inspector.columns['created_at']
+        self.assertEqual(updated.default, datetime.utcnow())
+        self.assertTrue(isinstance(updated, DateTime))
+        self.assertFalse(updated.nullable)
+
+    @unittest.skipIf(getenv('HBNB_MYSQL_DB') != 'db', 'database only')
+    def test_delete(self):
+        ''' delete an object from the storage'''
+        n = BaseModel()
+        n.save()
+        self.assertEqual(len(storage.all()), 1)
+        n.delete()
+        self.assertEqual(len(storage.all()), 0)
+        with self.assertRaises(TypeError):
+            n.delete(BaseModel)

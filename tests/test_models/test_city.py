@@ -14,6 +14,10 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import sessionmaker
 from tests.test_models.test_base_model import test_basemodel
 from models.city import City
+from os import getenv
+from sqlalchemy import DateTime, inspect, String
+from models.base_model import BaseModel, Base
+import unittest
 
 
 class test_City(test_basemodel):
@@ -26,7 +30,42 @@ class test_City(test_basemodel):
         self.value = City
 
     def test_state_id(self):
-        """Test state"""
+        """ """
+        new = City(name="New York", state_id="NY")
+        self.assertEqual(type(new.state_id), str)
+
+    def test_name(self):
+        """ """
+        new = City(name="New York", state_id="NY")
+        self.assertEqual(type(new.name), str)
+
+    def test_inhereatance(self):
+        '''test the inherirances'''
+        obj = City()
+        self.assertTrue(obj, BaseModel)
+        self.assertTrue(obj, Base)
+
+    @unittest.skipUnless(getenv('HBNB_MYSQL_DB') == 'db', 'database only')
+    def test_class_atts(self):
+        '''test class attributes of the clsss'''
+        obj = City()
+
+        inspector = inspect(obj)
+
+        # get the table name
+        self.assertTrue(inspector.get_table_name(), 'cities')
+
+        # for name
+        name = inspector.columns['name']
+        self.assertTrue(isinstance(name, String))
+        self.assertEqual(name.type.length, 128)
+        self.assertFalse(name.nullable)
+
+        state = inspector.columns['state_id']
+        self.assertTrue(isinstance(state, String))
+        self.assertFalse(state.nullable)
+        self.assertTrue(state.ForeignKey)
+        """Test statr"""
         new = self.value()
         self.assertEqual(type(new.state_id), str)
 
@@ -212,7 +251,3 @@ class test_City(test_basemodel):
                          city_dict["updated_at"])
         self.assertEqual(self.city.name, city_dict["name"])
         self.assertEqual(self.city.state_id, city_dict["state_id"])
-
-
-if __name__ == "__main__":
-    unittest.main()
