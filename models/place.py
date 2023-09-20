@@ -44,7 +44,7 @@ class Place(BaseModel, Base):
         def reviews(self):
             """Get list of linked reviews"""
             related_reviews = []
-            for review in storage.all(Review).values():
+            for review in list(models.storage.all(Review).values()):
                 if review.place_id == self.id:
                     related_reviews.append(review)
             return related_reviews
