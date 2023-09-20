@@ -15,8 +15,8 @@ class User(BaseModel):
         first_name (str): User's first name
         last_name (str): User's last name
     """
-    __tablename__ = 'cities'
+    __tablename__ = 'users'
     email = Column(String(128), nullable=False)
     password = Column(String(128), nullable=False)
-    first_name = Column(String(128), nullable=True)
-    last_name = Column(String(128), nullable=True)
+    first_name = Column(String(128))
+    last_name = Column(String(128))
