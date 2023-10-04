@@ -141,4 +141,6 @@ Usage: <class_name>.update(<_id>, <dictionary>)
 ```
 <br>
 
-THis project aims to create a storage syystem using files and data 
+THis project aims to create a storage syystem using files and data
+
+In addition weare deploying the code on servver using bash script and fabric 
