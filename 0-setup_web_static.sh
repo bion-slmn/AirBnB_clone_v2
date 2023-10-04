@@ -21,14 +21,10 @@ echo '<html>
   </body>
 </html>' > /data/web_static/releases/test/index.html
 
-#create a symbolic link 
-if [ -L "/data/web_static/current" ] && [ -e "/data/web_static/current" ]
-then
-	unlink /data/web_static/current
-	ln -s /data/web_static/releases/test/ /data/web_static/current
-else
-	ln -s /data/web_static/releases/test/ /data/web_static/current
-fi
+#create a symbolic link and 
+#-f(if file already exists, will be removed & link be created)
+ln -sf /data/web_static/releases/test/ /data/web_static/current
+
 # changing ownership
 sudo chown -R ubuntu:ubuntu /data/
 
