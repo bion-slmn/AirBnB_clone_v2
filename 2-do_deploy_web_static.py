@@ -48,9 +48,10 @@ def do_deploy(archive_path):
 
     # extracting
     run(f'sudo tar -C {dest_folder} -xvf /tmp/{file_name}')
-    run(f'sudo rm /tmp/{file_name}')
-    run('sudo rm -f /data/web_static/current')
-    run(f'sudo mv {dest_folder}/web_static/* {dest_folder}')
+    run(f'sudo rm -rf /tmp/{file_name}')
+    run('sudo rm -rf /data/web_static/current')
+    run(f'sudo mv  {dest_folder}/web_static/* {dest_folder}')
+    run(f'sudo rm -rf {dest_folder}/web_static')
     run(f'ln -s {dest_folder} /data/web_static/current')
-
+    print('New version deployed!')
     return True
