@@ -27,7 +27,7 @@ def do_deploy(archive_path):
         run(f'sudo mkdir -p {dest_dir}')
 
         # unzip the acrchive
-        run(f'sudo tar -C {dest_dir} -xvf /tmp/{file_name}')
+        run(f'sudo tar -C {dest_dir} -xzf /tmp/{file_name}')
         # remove the acrchive
         run(f'sudo rm /tmp/{file_name}')
         # move the content
