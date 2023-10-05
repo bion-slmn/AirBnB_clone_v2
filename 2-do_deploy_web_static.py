@@ -6,7 +6,31 @@ from datetime import date
 from datetime import datetime
 import os.path
 
+
 env.hosts = ['54.89.179.242', '3.90.83.124']
+
+
+def do_pack():
+    ''' the function to generate compressed file'''
+    local('mkdir -p versions')
+    today = date.today()
+    now = datetime.now()
+
+    print('here')
+
+    file_name = "web_static_{}{}{}{}{}{}.tgz".format(today.year,
+                                                     today.month,
+                                                     today.day,
+                                                     now.hour,
+                                                     now.minute,
+                                                     now.second)
+
+    comp = local('tar -czvf versions/{} web_static'.format(file_name))
+
+    if comp.failed:
+        return None
+
+    return 'versions/{}'.format(file_name)
 
 
 def do_deploy(archive_path):
