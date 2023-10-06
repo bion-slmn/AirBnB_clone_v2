@@ -24,5 +24,7 @@ def do_clean(number=0):
     if no == 0 or no == 1:
         no = 1
 
-    local('ls -t versions | tail +{} | xargs -I % rm -rf versions/%'.format(no + 1))
-    run('ls -t {} | tail +{} | xargs -I % rm -rf versions/%'.format(remote_path, no + 1))
+    local('ls -t versions | tail +{} | xargs -I % rm -rf versions/%'
+          .format(no + 1))
+    run('ls -t {} | tail +{} | xargs -I % rm -rf versions/%'
+        .format(remote_path, no + 1))
