@@ -13,26 +13,21 @@ def do_clean(number=0):
             number is 2, keep the most recent, and second most recent versions
             and son on
     '''
+    no = int(number)
     # puting the content in list content of the directory
     dir_path = '/data/web_static/releases/'
     dir_path1 = 'versions'
 
-    dir_list = run(f'ls {dir_path}').split()
-    dir_list1 = local(f'ls {dir_path1}', capture=True).split()
-    # sort them in desceding order
-    sorted_list = sorted(dir_list, reverse=True)
-    sorted_list1 = sorted(dir_list1, reverse=True)
-    # delete accordingly
-    if int(number) == 0 or int(number) == 1:
-        number = 1
-        print('HERE')
-    else:
-        number = int(number)
+    dir_list = run('ls -t {}'.format(dir_path)).split()
+    dir_list1 = sorted(os.listdir(dir_path1), reverse=True)
 
-    for arch in sorted_list[number:]:
+    # delete accordingly
+    if no == 0 or no == 1:
+        no = 1
+
+    for arch in dir_list[no:]:
         path = os.path.join(dir_path, arch)
-        print(f'{path} PAATJ')
-        run(f'rm -rf {path}')
-    for arch in sorted_list1[number:]:
+        run('rm -rf {}'.format(path))
+    for arch in dir_list1[no:]:
         path = os.path.join(dir_path1, arch)
-        local(f'rm -rf {path}')
+        local('rm -rf {}'.format(path))
