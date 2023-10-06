@@ -15,7 +15,7 @@ def do_clean(number=0):
     '''
     # puting the content in list content of the directory
     dir_path = '/data/web_static/releases/'
-    dir_path1 = './versions'
+    dir_path1 = 'versions'
 
     dir_list = run(f'ls {dir_path}').split()
     dir_list1 = local(f'ls {dir_path1}', capture=True).split()
