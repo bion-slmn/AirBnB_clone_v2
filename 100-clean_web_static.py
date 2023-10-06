@@ -15,19 +15,14 @@ def do_clean(number=0):
     '''
     no = int(number)
     # puting the content in list content of the directory
-    dir_path = '/data/web_static/releases/'
-    dir_path1 = 'versions'
+    remote_path = '/data/web_static/releases/'
+    local_path = 'versions'
 
-    dir_list = run('ls -t {}'.format(dir_path)).split()
-    dir_list1 = sorted(os.listdir(dir_path1), reverse=True)
+    no = int(number)
 
     # delete accordingly
     if no == 0 or no == 1:
         no = 1
 
-    for arch in dir_list[no:]:
-        path = os.path.join(dir_path, arch)
-        run('rm -rf {}'.format(path))
-    for arch in dir_list1[no:]:
-        path = os.path.join(dir_path1, arch)
-        local('rm -rf {}'.format(path))
+    local('ls -t versions | tail +{} | xargs -I % rm -rf versions/%'.format(no + 1))
+    run('ls -t {} | tail +{} | xargs -I % rm -rf versions/%'.format(remote_path, no + 1))
