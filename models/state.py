@@ -20,6 +20,6 @@ class State(BaseModel, Base):
             '''getter attribute cities that returns the list of City instances
             with state_id equals to the current State.id'''
 
-            city_objs = model.storage.all(City)
+            city_objs = models.storage.all(City)
             return [c_obj for c_obj in city_objs.values()
                     if c_obj.state_id == self.id]
