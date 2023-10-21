@@ -11,7 +11,6 @@ app = Flask(__name__)
 @app.route('/states_list', strict_slashes=False)
 def state_list():
     ''' we query the database to get the all the states in th database'''
-    # os.environ['HBNB_TYPE_STORAGE'] = 'db'
     obj = storage.all('State').values()
     return render_template('7-states_list.html', state=obj)
 
