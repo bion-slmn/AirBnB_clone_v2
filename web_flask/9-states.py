@@ -12,10 +12,9 @@ app = Flask(__name__)
 def state_list():
     ''' we query the database to get the all the states and state and cities
     associated with athat state in th database'''
-    #os.environ['HBNB_TYPE_STORAGE'] = 'db'
     state_obj = storage.all('State').values()
     sorted_state_obj = sorted(state_obj, key=lambda obj: obj.name)
-    return render_template('9-states.html', state = sorted_state_obj)
+    return render_template('9-states.html', state=sorted_state_obj)
 
 
 @app.route('/states/<id>', strict_slashes=False)
@@ -24,7 +23,7 @@ def state_id(id):
     state_dict = storage.all('State')
     key = f'State.{id}'
 
-    return render_template('9-states.html', state = state_dict, key = key)
+    return render_template('9-states.html', state=state_dict, key=key)
 
 
 @app.teardown_appcontext
