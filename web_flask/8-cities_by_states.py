@@ -14,7 +14,7 @@ def state_list():
     associated with athat state in th database'''
     state_obj = storage.all('State').values()
     sorted_state_obj = sorted(state_obj, key=lambda obj: obj.name)
-    return render_template('8-cities_by_states.html', state=sorted_state_obj)
+    return render_template('8-cities_by_states.html', states=sorted_state_obj)
 
 
 @app.teardown_appcontext
