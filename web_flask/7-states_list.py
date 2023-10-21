@@ -1,26 +1,27 @@
 #!/usr/bin/python3
 '''this module uses flask and data bse to list
 cities of a state'''
-from flask import Flask, render_template
+from flask import Flask
+from flask import render_template
 from models import storage
 
 
 app = Flask(__name__)
 
 
-@app.route('/states_list', strict_slashes=False)
+@app.route("/states_list", strict_slashes=False)
 def state_list():
     ''' we query the database to get the all the states in th database'''
-    states = storage.all('State')
-    return render_template('7-states_list.html', state=states)
+    states = storage.all('State').values()
+    sorted_states = sorted(states, key=lambda obj: obj.name)
+    return render_template('7-states_list.html', states=sorted_states)
 
 
 @app.teardown_appcontext
-def teardown(exc):
-    ''' this method is called when the request has been completed or
-    an exception has occurred to close the connection'''
+def teardown(exception):
+    ''' closes the sessionto storage after a request'''
     storage.close()
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+    app.run(host='0.0.0.0')
