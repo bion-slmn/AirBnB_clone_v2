@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<HTML lang="en">
+    <HEAD>
+        <TITLE>HBNB</TITLE>
+    </HEAD>
+    <BODY>
+        <H1>States</H1>
+	<UL>
+	    {% for state_obj in state %}
+	    <LI>{{ state_obj.id }}: <B>{{ state_obj.name }}</B>
+	    	<UL>
+		{% set sorted_city = state_obj.cities|sort(attribute='name') %}
+	    	{% for citi in sorted_city %}
+	    		<LI>{{citi.id}}: <B>{{citi.name}}</B></LI>
+	    	{% endfor %}
+	    	</UL>
+	    <LI>
+	    {% endfor %}
+        </UL>
+    </BODY>
+</HTML>
