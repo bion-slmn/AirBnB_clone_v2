@@ -60,3 +60,7 @@ class FileStorage:
                 if v == obj:
                     key = k
             FileStorage.__objects.pop(key, None)
+
+    def close(self):
+        '''this method calls reloads to deserialize Json to objects'''
+        self.reload()
