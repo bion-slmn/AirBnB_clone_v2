@@ -11,12 +11,12 @@ app = Flask(__name__)
 @app.route('/states_list', strict_slashes=False)
 def state_list():
     ''' we query the database to get the all the states in th database'''
-    obj = storage.all('State').values()
-    return render_template('7-states_list.html', state=obj)
+    states = storage.all('State')
+    return render_template('7-states_list.html', state=states)
 
 
 @app.teardown_appcontext
-def teardown(exception):
+def teardown(exc):
     ''' this method is called when the request has been completed or
     an exception has occurred to close the connection'''
     storage.close()
